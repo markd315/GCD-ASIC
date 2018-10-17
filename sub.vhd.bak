@@ -1,0 +1,30 @@
+Library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+
+entity sub is
+  generic(
+    WIDTH : natural);  -- Number of input bits
+  port(
+    X   : in  std_logic_vector(WIDTH-1 downto 0);
+	 Y   : in  std_logic_vector(WIDTH-1 downto 0);
+	 x_lt_y : out std_logic;
+	 x_ne_y : out std_logic;
+	 output   : out std_logic_vector(WIDTH-1 downto 0));
+end entity;
+
+architecture syn of sub
+SIGNAL subresult : signed(WIDTH downto 0);
+begin
+	x_lt_y <= '0';
+	x_ne_y <= '0';
+	subresult <= signed(X(WIDTH-1 downto 0)) - signed(Y(WIDTH-1 downto 0));
+	if(X < Y) then
+		x_lt_y <= '1';
+		x_ne_y <= '1';
+	elsif (X > Y) then
+		x_ne_y <= '1';
+	end if;
+	output = std_logic_vector(subresult);
+end architecture;

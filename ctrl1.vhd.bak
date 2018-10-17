@@ -1,0 +1,140 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity ctrl1 is
+  generic (
+    WIDTH : positive := 16);
+  port (
+	 x      : in  std_logic_vector(WIDTH-1 downto 0);
+    y      : in  std_logic_vector(WIDTH-1 downto 0);
+    x_sel    : in  std_logic;
+	 y_sel    : in  std_logic;
+    x_en    : in  std_logic;
+	 y_en    : in  std_logic;
+	 output_en    : in  std_logic;
+	 x_lt_y    : out  std_logic;
+	 x_ne_y    : out  std_logic;
+    output : out std_logic_vector(WIDTH-1 downto 0));
+end entity;
+
+
+architecture FSM_D1 of ctrl1 is
+signal muxedX : std_logic_vector(WIDTH-1 downto 0);
+signal muxedY : std_logic_vector(WIDTH-1 downto 0);
+signal regX : std_logic_vector(WIDTH-1 downto 0);
+signal regY : std_logic_vector(WIDTH-1 downto 0);
+signal subX : std_logic_vector(WIDTH-1 downto 0);
+signal subY : std_logic_vector(WIDTH-1 downto 0);
+COMPONENT genmux
+		generic (
+            WIDTH : positive := WIDTH
+            );
+		port(A, B : in std_logic_vector(WIDTH-1 downto 0);
+			Y : out std_logic_vector(WIDTH-1 downto 0);
+			S : in std_logic);
+END COMPONENT ;
+
+COMPONENT cmp
+		generic (
+            WIDTH : positive := WIDTH
+            );
+		port(X, Y : in std_logic_vector(WIDTH-1 downto 0);
+			x_lt_y, x_ne_y : out std_logic);
+END COMPONENT ;
+
+COMPONENT regis
+		generic (
+            WIDTH : positive := WIDTH
+            );
+		port(i : in std_logic_vector(WIDTH-1 downto 0);
+			o : out std_logic_vector(WIDTH-1 downto 0);
+			en : in std_logic);
+END COMPONENT ;
+
+COMPONENT sub
+		generic (
+            WIDTH : positive := WIDTH
+            );
+		port(A, B : in std_logic_vector(WIDTH-1 downto 0);
+			output : out std_logic_vector(WIDTH-1 downto 0));
+END COMPONENT ;
+
+begin  -- FSM_D1
+
+xmux : genmux
+        generic map (
+            WIDTH => WIDTH) -- 50 MHZ to 1Khz
+        port map (
+            A => x,
+            B      => subX,
+				Y      => muxedX,
+            S  => x_sel);
+
+ymux : genmux
+        generic map (
+            WIDTH => WIDTH) -- 50 MHZ to 1Khz
+        port map (
+            A => y,
+            B      => subY,
+				Y      => muxedY,
+            S  => y_sel);
+
+xreg : regis
+        generic map (
+            WIDTH => WIDTH) -- 50 MHZ to 1Khz
+        port map (
+            i => muxedX,
+            o => regX,
+				en  => x_en);
+
+yreg : regis
+        generic map (
+            WIDTH => WIDTH) -- 50 MHZ to 1Khz
+        port map (
+            i => muxedY,
+            o => regY,
+				en  => y_en);
+				
+cmprtr : cmp
+        generic map (
+            WIDTH => WIDTH) -- 50 MHZ to 1Khz
+        port map (
+            X => regX,
+            Y => regY,
+				x_lt_y => x_lt_y,
+				x_ne_y  => x_ne_y);
+				
+xsub : sub
+        generic map (
+            WIDTH => WIDTH) -- 50 MHZ to 1Khz
+        port map (
+            A => regX,
+            B => regY,
+				output  => subX);
+
+ysub : sub
+        generic map (
+            WIDTH => WIDTH) -- 50 MHZ to 1Khz
+        port map (
+            A => regY,
+            B => regX,
+				output  => subY);
+	
+outreg : regis
+        generic map (
+            WIDTH => WIDTH) -- 50 MHZ to 1Khz
+        port map (
+            i => regX,
+            o => output,
+				en  => output_en);
+end FSM_D1;
+
+architecture FSM_D2 of ctrl1 is
+
+begin  -- FSM_D2
+--This one is going to be mostly the same, we just use the x_lt_y comparator signal to infer the direction of the subtractor.
+
+  
+
+end FSM_D2;

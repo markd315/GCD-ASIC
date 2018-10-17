@@ -1,0 +1,9 @@
+
+State Machine - |top_level|gcd:U_GCD|ctrl1:controller|state
+Name state.outs state.ldoutput state.ldsuby state.ldsubx state.calc state.inld 
+state.inld 0 0 0 0 0 0 
+state.calc 0 0 0 0 1 1 
+state.ldsubx 0 0 0 1 0 1 
+state.ldsuby 0 0 1 0 0 1 
+state.ldoutput 0 1 0 0 0 1 
+state.outs 1 0 0 0 0 1 

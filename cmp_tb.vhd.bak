@@ -1,0 +1,39 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity cmp_tb is
+end cmp_tb;
+
+architecture TB of cmp_tb is
+
+signal clk    : std_logic;
+signal rst    : std_logic;
+signal output : std_logic_vector(3 downto 0);
+
+begin  -- TB
+
+  UUT : entity work.cmp
+    port map (
+      clk    => clk,
+      rst    => rst,
+      output => output);
+
+  process
+  begin
+    -- test all input combinations
+    for i in 0 to 1 loop
+	  for j in 0 to 32 loop
+          rst <= std_logic(to_unsigned(i, 1)(0));
+		  clk <= std_logic(to_unsigned(j, 1)(0));
+          wait for 120 ns;
+        end loop;
+      end loop;
+
+    report "SIMULATION FINISHED!";
+    
+    wait;
+
+  end process;
+
+end TB;
